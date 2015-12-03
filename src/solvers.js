@@ -27,38 +27,33 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  // var solutionsCount = 0;
-  var comboArray = []
-  var onlyOptions = [];
-  for(var i = 0; i < n; i++){
-    comboArray.push(0);
-  }
-  for (var j = 0; j < comboArray.length; j++) {
-    var possible = comboArray.slice(0);
-    possible[j] = 1;
-    onlyOptions.push(possible);
-  }
+  // create a new Board(n)
+  var solutionBoard = new Board({n: n});
+  var solutionCount = 0;
 
-  var findSolutions = function(nLeft, solutionSoFar, solutionsCount) {
-    solutionsCount = solutionsCount || {count: 0};
-    if (nLeft === 0) {
-      var testBoard = new Board(solutionSoFar);
-      if (!testBoard.hasAnyRooksConflicts()) {
-        console.log('Found One')
-        solutionsCount.count++;
+  var findSolution = function(potentialSolution, startColumn, row) {
+    row = row || 0;
+    // switch at the starting column
+    potentialSolution.togglePiece(row, startColumn);
+
+    // if there there is a conflict
+    if (potentialSolution.hasAnyRooksConflicts()) {
+      potentialSolution.togglePiece(row, startColumn);
+      // findSolution(potentialSolution, startColumn++ , row);
+    } else if (row === (n - 1)){
+      return solutionCount++; //increment solution count and continue with loop
+    } else {
+      for (var i = 0; i < n; i++) {
+        findSolution(potentialSolution, i, row + 1);
       }
-      return solutionsCount.count;
     }
-    nLeft--;
+  };
 
-    for (var i = 0; i < onlyOptions.length; i++) {
-      var currentRow = [onlyOptions[i]];
-      solutionsCount.count = findSolutions(nLeft, solutionSoFar.concat(currentRow), solutionsCount);
-    }
-    return solutionsCount.count;
+  for (var x = 0; x < n; x++) {
+    findSolution(solutionBoard, x);
   }
-  // console.log('Number of solutions for ' + n + ' rooks:', solutionsCount);
-  return findSolutions(n, []);
+
+  return solutionCount;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
