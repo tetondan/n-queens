@@ -27,30 +27,80 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  // create a new Board(n)
+  // mathmatical solution
+    // var array = [];
+    // for (var i = 1; i <= n; i++) {
+    //   array.push(i);
+    // }
+    // return _.reduce(array, function(acc, solutions) {
+    //   acc = acc * solutions;
+    //   return acc;
+    // })
+
+  // recursion "solution
   var solutionBoard = new Board({n: n});
   var solutionCount = 0;
 
-  var findSolution = function(potentialSolution, startColumn, row) {
-    row = row || 0;
-    // switch at the starting column
-    potentialSolution.togglePiece(row, startColumn);
 
-    // if there there is a conflict
-    if (potentialSolution.hasAnyRooksConflicts()) {
-      potentialSolution.togglePiece(row, startColumn);
-      // findSolution(potentialSolution, startColumn++ , row);
-    } else if (row === (n - 1)){
-      return solutionCount++; //increment solution count and continue with loop
-    } else {
-      for (var i = 0; i < n; i++) {
-        findSolution(potentialSolution, i, row + 1);
+  var findSolution = function(potentialSolution, column, row) {
+    row = row || 0;
+    potentialSolution.togglePiece(0, column);
+    if (n >= 2) {
+      row = 1;
+    }   
+    //loop through from 0 to n-1
+    for(var columnCount = 0; columnCount < n; columnCount++){
+      //toggle current position
+      if (row !== 0 && columnCount !== column) {
+        potentialSolution.togglePiece(row, columnCount);
+      }
+      //check for conlifcts and if none 
+      if(!potentialSolution.hasAnyRooksConflicts()){
+        // if rooks === n (by reducing .rows()
+        if(_.reduce(_.flatten(solutionBoard.rows()), function(a,b) { return a + b }) === n){
+          //increase solutionCount
+          solutionCount++;
+          console.dir(potentialSolution + ' for n = ' + n)
+          //if in last row but not last column
+          if(columnCount < n){
+            //toggle current poistion back to zero(end of current loop)
+            potentialSolution.togglePiece(row, columnCount);
+          }
+        // else if there are not enough rooks to make a solution
+        } else {
+          // if it is not in the last row
+          if (row < n) {
+            // increase the row
+            var nextRow = row + 1;
+            //run the finder function with updated row 
+            findSolution(potentialSolution, column, nextRow);
+          // else there are no conflicts, there are not enough rook, it is in the final row
+          } else {
+            // if it is not in the final column
+            if (columnCount < n) {
+              // toggle
+              potentialSolution.togglePiece(row, columnCount);      
+            // else
+            } else {
+              // break
+              break;
+            }
+          }
+        }
+        //if there are conflicts: toggle position back, end of loop
+      } else {
+        // if in the last columnCount, but not the last row
+          // toggle
+          // increase row by 1
+          // run findSolution
+        // else 
+        potentialSolution.togglePiece(row, columnCount);
       }
     }
-  };
+  }
 
-  for (var x = 0; x < n; x++) {
-    findSolution(solutionBoard, x);
+  for (var columns = 0; columns < n; columns++) {
+    findSolution(solutionBoard, columns);
   }
 
   return solutionCount;
