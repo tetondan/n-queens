@@ -21,24 +21,51 @@ window.findNRooksSolution = function(n) {
     solution.togglePiece(i,i);
   }
 
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  console.log(solution.hasAnyRooksConflicts());
+  // console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution.rows();
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solution = undefined; //fixme
+  // var solutionsCount = 0;
+  var comboArray = []
+  var onlyOptions = [];
+  for(var i = 0; i < n; i++){
+    comboArray.push(0);
+  }
+  for (var j = 0; j < comboArray.length; j++) {
+    var possible = comboArray.slice(0);
+    possible[j] = 1;
+    onlyOptions.push(possible);
+  }
 
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
+  var findSolutions = function(nLeft, solutionSoFar, solutionsCount) {
+    solutionsCount = solutionsCount || {count: 0};
+    if (nLeft === 0) {
+      var testBoard = new Board(solutionSoFar);
+      if (!testBoard.hasAnyRooksConflicts()) {
+        console.log('Found One')
+        solutionsCount.count++;
+      }
+      return solutionsCount.count;
+    }
+    nLeft--;
+
+    for (var i = 0; i < onlyOptions.length; i++) {
+      var currentRow = [onlyOptions[i]];
+      solutionsCount.count = findSolutions(nLeft, solutionSoFar.concat(currentRow), solutionsCount);
+    }
+    return solutionsCount.count;
+  }
+  // console.log('Number of solutions for ' + n + ' rooks:', solutionsCount);
+  return findSolutions(n, []);
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
   var solution = undefined; //fixme
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  // console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
 
