@@ -111,7 +111,8 @@
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
       var rows = this.rows();
-      var column = []
+      var column = [];
+
       for(var i = 0; i < rows.length; i++){
         column.push(rows[i][colIndex]);
       }
@@ -138,7 +139,7 @@
     // test if a specific major diagonal on this board contains a conflict
     hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
       var start = majorDiagonalColumnIndexAtFirstRow;
-      var diagonal = []      
+      var diagonal = [];      
       if (start >= 0 ) {
         // start at 0 row, start column
         var row = 0
